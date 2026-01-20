@@ -31,7 +31,7 @@ export function BlobMascot({
 
   // Store original vertex positions on first render
   const geometry = useMemo(() => {
-    const geo = new THREE.IcosahedronGeometry(1, 4);
+    const geo = new THREE.IcosahedronGeometry(1, 5);
     return geo;
   }, []);
 
