@@ -28,26 +28,26 @@ export function BlobMascot({
     return geo;
   }, []);
 
-  // Bouncy idle animation using spring
+  // Bouncy idle animation using spring - gentler, more flowy
   const { bounceY } = useSpring({
     from: { bounceY: 0 },
     to: async (next) => {
       while (true) {
-        await next({ bounceY: 0.15, config: { tension: 200, friction: 10 } });
-        await next({ bounceY: -0.1, config: { tension: 300, friction: 15 } });
+        await next({ bounceY: 0.06, config: { tension: 80, friction: 14 } });
+        await next({ bounceY: -0.04, config: { tension: 100, friction: 16 } });
       }
     },
     loop: true,
   });
 
-  // Squash and stretch animation
+  // Squash and stretch animation - subtler
   const { squash } = useSpring({
     from: { squash: 1 },
     to: async (next) => {
       while (true) {
-        await next({ squash: 0.92, config: { tension: 250, friction: 12 } });
-        await next({ squash: 1.08, config: { tension: 300, friction: 15 } });
-        await next({ squash: 1, config: { tension: 200, friction: 20 } });
+        await next({ squash: 0.97, config: { tension: 60, friction: 18 } });
+        await next({ squash: 1.03, config: { tension: 80, friction: 20 } });
+        await next({ squash: 1, config: { tension: 70, friction: 22 } });
       }
     },
     loop: true,
@@ -81,13 +81,13 @@ export function BlobMascot({
       const ny = oy / length;
       const nz = oz / length;
 
-      // Create wiggly displacement using noise
-      const noiseFreq = 1.5;
-      const noiseAmp = 0.12;
+      // Create wiggly displacement using noise - gentler, slower
+      const noiseFreq = 1.2;
+      const noiseAmp = 0.06;
       const noiseValue = noise3D(
-        nx * noiseFreq + time * 0.8,
-        ny * noiseFreq + time * 0.6,
-        nz * noiseFreq + time * 0.7
+        nx * noiseFreq + time * 0.3,
+        ny * noiseFreq + time * 0.25,
+        nz * noiseFreq + time * 0.28
       );
 
       // Apply displacement along normal
@@ -101,13 +101,13 @@ export function BlobMascot({
     geo.computeVertexNormals();
   });
 
-  // Create gradient material
+  // Create soft, matte material - less plastic-like
   const material = useMemo(() => {
     return new THREE.MeshStandardMaterial({
       color: new THREE.Color(color),
-      roughness: 0.3,
-      metalness: 0.1,
-      envMapIntensity: 0.5,
+      roughness: 0.7,
+      metalness: 0.0,
+      envMapIntensity: 0.15,
     });
   }, [color]);
 
@@ -129,7 +129,7 @@ export function BlobMascot({
       />
 
       {/* Face overlay - only show on main blob */}
-      {scale >= 1 && <Face />}
+      {scale >= 1 && <Face blobColor={color} />}
 
       {/* Subtle inner glow */}
       <mesh scale={0.85}>

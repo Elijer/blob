@@ -1,29 +1,46 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Text } from "@react-three/drei";
 import * as THREE from "three";
 
-type MouthExpression = "happy" | "excited" | "surprised" | "neutral";
-type EyeState = "open" | "closed" | "squint";
+type MouthExpression = "happy" | "excited" | "surprised" | "neutral" | "small" | "dot";
+type EyeState = "open" | "closed" | "squint" | "round";
 
 interface FaceProps {
   expression?: MouthExpression;
+  blobColor?: string;
 }
 
 const MOUTH_CHARS: Record<MouthExpression, string> = {
-  happy: "‿",      // Curved smile
+  happy: "(",      // Smiley face curve
   excited: "D",    // Big grin (will be rotated)
   surprised: "o",  // Round mouth
   neutral: "─",    // Flat line
+  small: "-",      // Small dash
+  dot: ".",        // Tiny dot
 };
 
 const EYE_CHARS: Record<EyeState, string> = {
   open: "^",       // Happy eyes
   closed: "─",     // Blinking
   squint: "≈",     // Squinty
+  round: "o",      // Round curious eyes
 };
 
-export function Face({ expression = "happy" }: FaceProps) {
+// Derive a darker shade from the blob color for the face features
+function getDarkerShade(hexColor: string, factor: number = 0.35): string {
+  const color = new THREE.Color(hexColor);
+  // Darken the color by reducing its lightness
+  const hsl = { h: 0, s: 0, l: 0 };
+  color.getHSL(hsl);
+  // Make it darker and slightly more saturated
+  hsl.l = hsl.l * factor;
+  hsl.s = Math.min(1, hsl.s * 1.2);
+  color.setHSL(hsl.h, hsl.s, hsl.l);
+  return `#${color.getHexString()}`;
+}
+
+export function Face({ expression = "happy", blobColor = "#ff9a9e" }: FaceProps) {
   const leftEyeRef = useRef<THREE.Object3D>(null);
   const rightEyeRef = useRef<THREE.Object3D>(null);
   const mouthRef = useRef<THREE.Object3D>(null);
@@ -32,24 +49,48 @@ export function Face({ expression = "happy" }: FaceProps) {
   const [eyeState, setEyeState] = useState<EyeState>("open");
   const [currentExpression, setCurrentExpression] = useState<MouthExpression>(expression);
 
-  // Blinking logic
+  // Compute darker shade for face features
+  // const faceColor = useMemo(() => getDarkerShade(blobColor, 0.3), [blobColor]);
+  const faceColor = "#9C454D"
+
+  // Slightly lighter shade for blush (tinted toward pink)
+  const blushColor = useMemo(() => {
+    const color = new THREE.Color(blobColor);
+    const hsl = { h: 0, s: 0, l: 0 };
+    color.getHSL(hsl);
+    // Shift toward pink/red and make lighter
+    color.setHSL(hsl.h * 0.95, Math.min(1, hsl.s * 1.3), Math.min(0.75, hsl.l * 1.2));
+    return `#${color.getHexString()}`;
+  }, [blobColor]);
+
+  // Blinking and eye state logic
   useEffect(() => {
     const blinkInterval = setInterval(() => {
-      // Random blink every 2-5 seconds
-      if (Math.random() > 0.3) {
+      const rand = Math.random();
+      if (rand < 0.6) {
+        // Normal blink
         setEyeState("closed");
-        setTimeout(() => setEyeState("open"), 120); // Quick blink
+        setTimeout(() => setEyeState("open"), 120);
+      } else if (rand < 0.75) {
+        // Occasional round curious eyes
+        setEyeState("round");
+        setTimeout(() => setEyeState("open"), 800 + Math.random() * 600);
+      } else if (rand < 0.85) {
+        // Occasional squint
+        setEyeState("squint");
+        setTimeout(() => setEyeState("open"), 500 + Math.random() * 400);
       }
+      // Otherwise stay as-is
     }, 2500 + Math.random() * 2500);
 
     return () => clearInterval(blinkInterval);
   }, []);
 
-  // Randomly change expression occasionally
+  // Randomly change mouth expression occasionally
   useEffect(() => {
     const expressionInterval = setInterval(() => {
-      const expressions: MouthExpression[] = ["happy", "excited", "surprised", "neutral"];
-      const weights = [0.5, 0.25, 0.15, 0.1]; // Mostly happy
+      const expressions: MouthExpression[] = ["happy", "excited", "surprised", "neutral", "small", "dot"];
+      const weights = [0.40, 0.18, 0.12, 0.10, 0.12, 0.08]; // Mostly happy, occasional variety
       const random = Math.random();
       let cumulative = 0;
       for (let i = 0; i < weights.length; i++) {
@@ -92,17 +133,25 @@ export function Face({ expression = "happy" }: FaceProps) {
   const eyeChar = EYE_CHARS[eyeState];
   const mouthChar = MOUTH_CHARS[currentExpression];
 
-  // Position for excited mouth (rotated D)
-  const mouthRotation = currentExpression === "excited" ? -Math.PI / 2 : 0;
+  // Rotation for certain mouth expressions
+  const getMouthRotation = () => {
+    switch (currentExpression) {
+      case "excited": return -Math.PI / 2;  // Rotate D to be sideways grin
+      case "happy": return Math.PI / 2;     // Rotate ( to be a smile
+      default: return 0;
+    }
+  };
+  const mouthRotation = getMouthRotation();
 
   return (
-    <group ref={groupRef} position={[0, 0.1, 0.95]}>
+    // Pushed further forward (z=1.12) to stay in front of blob deformations
+    <group ref={groupRef} position={[0, 0.1, 1.12]}>
       {/* Left Eye */}
       <Text
         ref={leftEyeRef as any}
         position={[-0.25, 0.15, 0]}
         fontSize={0.35}
-        color="#2d2d2d"
+        color={faceColor}
         anchorX="center"
         anchorY="middle"
       >
@@ -114,7 +163,7 @@ export function Face({ expression = "happy" }: FaceProps) {
         ref={rightEyeRef as any}
         position={[0.25, 0.15, 0]}
         fontSize={0.35}
-        color="#2d2d2d"
+        color={faceColor}
         anchorX="center"
         anchorY="middle"
       >
@@ -126,7 +175,7 @@ export function Face({ expression = "happy" }: FaceProps) {
         ref={mouthRef as any}
         position={[0, -0.2, 0]}
         fontSize={currentExpression === "excited" ? 0.45 : 0.3}
-        color="#2d2d2d"
+        color={faceColor}
         anchorX="center"
         anchorY="middle"
         rotation={[0, 0, mouthRotation]}
@@ -137,11 +186,11 @@ export function Face({ expression = "happy" }: FaceProps) {
       {/* Blush marks (optional cute detail) */}
       <mesh position={[-0.45, -0.05, 0]}>
         <circleGeometry args={[0.08, 16]} />
-        <meshBasicMaterial color="#ffb3ba" transparent opacity={0.6} />
+        <meshBasicMaterial color={blushColor} transparent opacity={0.5} />
       </mesh>
       <mesh position={[0.45, -0.05, 0]}>
         <circleGeometry args={[0.08, 16]} />
-        <meshBasicMaterial color="#ffb3ba" transparent opacity={0.6} />
+        <meshBasicMaterial color={blushColor} transparent opacity={0.5} />
       </mesh>
     </group>
   );

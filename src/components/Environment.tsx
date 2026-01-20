@@ -10,11 +10,11 @@ import * as THREE from "three";
 export function Environment() {
   const mainLightRef = useRef<THREE.DirectionalLight>(null);
 
-  // Subtle light animation
+  // Subtle light animation - gentler variation
   useFrame(({ clock }) => {
     if (mainLightRef.current) {
       const time = clock.getElapsedTime();
-      mainLightRef.current.intensity = 1.5 + Math.sin(time * 0.5) * 0.2;
+      mainLightRef.current.intensity = 1.0 + Math.sin(time * 0.3) * 0.1;
     }
   });
 
@@ -23,11 +23,11 @@ export function Environment() {
       {/* Main ambient lighting */}
       <ambientLight intensity={0.4} />
 
-      {/* Key light - warm tone */}
+      {/* Key light - warm tone, softer */}
       <directionalLight
         ref={mainLightRef}
         position={[5, 5, 5]}
-        intensity={1.5}
+        intensity={1.0}
         color="#fff5e6"
         castShadow
         shadow-mapSize={[1024, 1024]}
@@ -67,29 +67,29 @@ export function Environment() {
         color="#1a1a2e"
       />
 
-      {/* Environment map for reflections */}
+      {/* Environment map for reflections - softer, more diffuse */}
       <DreiEnvironment resolution={256}>
         <group rotation={[-Math.PI / 3, 0, 1]}>
           <Lightformer
             form="circle"
-            intensity={4}
+            intensity={1.5}
             rotation-x={Math.PI / 2}
             position={[0, 5, -9]}
-            scale={2}
+            scale={4}
           />
           <Lightformer
             form="circle"
-            intensity={2}
+            intensity={0.8}
             rotation-y={Math.PI / 2}
             position={[-5, 1, -1]}
-            scale={2}
+            scale={4}
           />
           <Lightformer
             form="ring"
             color="#ff9eb8"
-            intensity={1}
+            intensity={0.4}
             position={[10, 3, 0]}
-            scale={2}
+            scale={3}
           />
         </group>
       </DreiEnvironment>
