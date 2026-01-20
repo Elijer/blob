@@ -25,7 +25,7 @@ export function BlobMascot({
   const meshRef = useRef<THREE.Mesh>(null);
   const originalPositions = useRef<Float32Array | null>(null);
   const clickIntensity = useRef(0);
-  const [isLooking, setIsLooking] = useState(false);
+  const [lookDirection, setLookDirection] = useState<"none" | "left" | "right">("none");
 
   // Store original vertex positions on first render
   const geometry = useMemo(() => {
@@ -70,50 +70,38 @@ export function BlobMascot({
     config: { tension: 40, friction: 14 }, // Smooth and slow
   }));
 
-  // Head turn animation every ~8 seconds
-  // Sequence: center -> right -> left -> center (4 seconds total)
+  // Head turn animation: 8 seconds normal, then ~4 seconds looking to one side
   useEffect(() => {
-    const doHeadTurn = () => {
-      setIsLooking(true);
+    let timeoutId: ReturnType<typeof setTimeout>;
+    let isLeft = true; // Alternate direction
 
-      // Turn right first
-      headApi.start({
-        to: { rotationY: -HEAD_TURN_ANGLE },
-        config: { tension: 40, friction: 14 },
-        onRest: () => {
-          // Then turn left
-          setTimeout(() => {
-            headApi.start({
-              to: { rotationY: HEAD_TURN_ANGLE },
-              config: { tension: 40, friction: 14 },
-              onRest: () => {
-                // Return to center
-                setTimeout(() => {
-                  headApi.start({
-                    to: { rotationY: 0 },
-                    config: { tension: 40, friction: 14 },
-                    onRest: () => {
-                      setIsLooking(false);
-                    },
-                  });
-                }, 800);
-              },
-            });
-          }, 800);
-        },
-      });
+    const scheduleNextTurn = () => {
+      // Wait 8 seconds before turning
+      timeoutId = setTimeout(() => {
+        const direction = isLeft ? "left" : "right";
+        const angle = isLeft ? HEAD_TURN_ANGLE : -HEAD_TURN_ANGLE;
+        isLeft = !isLeft;
+
+        // Show looking eyes and start turning
+        setLookDirection(direction);
+        headApi.start({ rotationY: angle });
+
+        // After 2 seconds of holding, return
+        timeoutId = setTimeout(() => {
+          // Eyes back to normal immediately
+          setLookDirection("none");
+          // Turn back to center
+          headApi.start({ rotationY: 0 });
+
+          // After returning (~1.5s), schedule next turn
+          timeoutId = setTimeout(scheduleNextTurn, 1500);
+        }, 2000);
+      }, 8000);
     };
 
-    // Initial delay before first head turn
-    const initialTimeout = setTimeout(doHeadTurn, 5000);
+    scheduleNextTurn();
 
-    // Then repeat every ~8 seconds
-    const interval = setInterval(doHeadTurn, 8000 + Math.random() * 2000);
-
-    return () => {
-      clearTimeout(initialTimeout);
-      clearInterval(interval);
-    };
+    return () => clearTimeout(timeoutId);
   }, [headApi]);
 
   const handleClick = () => {
@@ -239,7 +227,7 @@ export function BlobMascot({
       </animated.group>
 
       {/* Face - rotates with the blob */}
-      {scale >= 1 && <Face blobColor={color} isLooking={isLooking} />}
+      {scale >= 1 && <Face blobColor={color} lookDirection={lookDirection} />}
     </animated.group>
   );
 }
