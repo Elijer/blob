@@ -107,7 +107,8 @@ function VolumetricLight({ position }: { position: [number, number, number] }) {
   useFrame(({ clock }) => {
     if (meshRef.current) {
       const time = clock.getElapsedTime();
-      meshRef.current.material.opacity = 0.03 + Math.sin(time * 0.8) * 0.01;
+      const material = meshRef.current.material as THREE.MeshBasicMaterial;
+      material.opacity = 0.03 + Math.sin(time * 0.8) * 0.01;
     }
   });
 
