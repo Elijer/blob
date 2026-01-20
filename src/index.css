@@ -15,6 +15,15 @@ body,
 
 /* For demo purposes, add a subtle gradient background */
 /* Remove this when embedding in a chatbox */
-body {
+body.with-background {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+}
+
+body.no-background {
+  background: transparent;
+}
+
+/* Default state - show background initially */
+body:not(.no-background):not(.with-background) {
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
 }
