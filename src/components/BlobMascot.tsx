@@ -23,8 +23,10 @@ export function BlobMascot({
   color = "#ff9a9e",
 }: BlobMascotProps) {
   const meshRef = useRef<THREE.Mesh>(null);
+  const groupRef = useRef<THREE.Group>(null);
   const originalPositions = useRef<Float32Array | null>(null);
   const clickIntensity = useRef(0);
+  const targetRotationY = useRef(0);
   const [lookDirection, setLookDirection] = useState<"none" | "left" | "right">("none");
 
   // Store original vertex positions on first render
@@ -64,45 +66,35 @@ export function BlobMascot({
     config: { tension: 300, friction: 10 },
   }));
 
-  // Head turn rotation spring (Y-axis rotation)
-  const [headSpring, headApi] = useSpring(() => ({
-    rotationY: 0,
-    config: { tension: 40, friction: 14 }, // Smooth and slow
-  }));
-
   // Head turn animation: 8 seconds normal, then ~4 seconds looking to one side
   useEffect(() => {
-    let timeoutId: ReturnType<typeof setTimeout>;
-    let isLeft = true; // Alternate direction
+    let isLeft = true;
 
-    const scheduleNextTurn = () => {
-      // Wait 8 seconds before turning
-      timeoutId = setTimeout(() => {
-        const direction = isLeft ? "left" : "right";
-        const angle = isLeft ? HEAD_TURN_ANGLE : -HEAD_TURN_ANGLE;
-        isLeft = !isLeft;
+    const doTurn = () => {
+      const direction = isLeft ? "left" : "right";
+      const angle = isLeft ? HEAD_TURN_ANGLE : -HEAD_TURN_ANGLE;
+      isLeft = !isLeft;
 
-        // Show looking eyes and start turning
-        setLookDirection(direction);
-        headApi.start({ rotationY: angle });
+      // Show looking eyes and start turning
+      setLookDirection(direction);
+      targetRotationY.current = angle;
 
-        // After 2 seconds of holding, return
-        timeoutId = setTimeout(() => {
-          // Eyes back to normal immediately
-          setLookDirection("none");
-          // Turn back to center
-          headApi.start({ rotationY: 0 });
-
-          // After returning (~1.5s), schedule next turn
-          timeoutId = setTimeout(scheduleNextTurn, 1500);
-        }, 2000);
-      }, 8000);
+      // After 2 seconds, return
+      setTimeout(() => {
+        setLookDirection("none");
+        targetRotationY.current = 0;
+      }, 2000);
     };
 
-    scheduleNextTurn();
+    // First turn after 3 seconds (for testing), then every 8 seconds
+    const firstTimeout = setTimeout(doTurn, 3000);
+    const interval = setInterval(doTurn, 8000);
 
-    return () => clearTimeout(timeoutId);
-  }, [headApi]);
+    return () => {
+      clearTimeout(firstTimeout);
+      clearInterval(interval);
+    };
+  }, []);
 
   const handleClick = () => {
     // Trigger the squish animation
@@ -116,6 +108,13 @@ export function BlobMascot({
   };
 
   useFrame(({ clock }) => {
+    // Animate head rotation toward target
+    if (groupRef.current) {
+      const currentY = groupRef.current.rotation.y;
+      const targetY = targetRotationY.current;
+      groupRef.current.rotation.y = THREE.MathUtils.lerp(currentY, targetY, 0.08);
+    }
+
     if (!meshRef.current) return;
 
     const mesh = meshRef.current;
@@ -189,13 +188,12 @@ export function BlobMascot({
   }, [color]);
 
   return (
+    <group ref={groupRef} position={position}>
     <animated.group
-      position={position}
       scale-x={squash.to((s) => scale / s)}
       scale-y={squash.to((s) => scale * s)}
       scale-z={squash.to((s) => scale / s)}
       position-y={bounceY}
-      rotation-y={headSpring.rotationY}
     >
       {/* Click reaction scale wrapper */}
       <animated.group
@@ -229,5 +227,6 @@ export function BlobMascot({
       {/* Face - rotates with the blob */}
       {scale >= 1 && <Face blobColor={color} lookDirection={lookDirection} />}
     </animated.group>
+    </group>
   );
 }

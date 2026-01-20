@@ -78,17 +78,18 @@ export function Face({ expression = "happy", blobColor = "#ff9a9e", lookDirectio
   };
 
   const eyeChar = getEyeChar();
-  const mouthChar = MOUTH_CHARS[currentExpression];
-  const mouthRotation = currentExpression === "happy" ? Math.PI / 2 : 0;
+  // Use "." mouth while looking, otherwise use current expression
+  const mouthChar = isLooking ? "`" : MOUTH_CHARS[currentExpression];
+  const mouthRotation = (!isLooking && currentExpression === "happy") ? Math.PI / 2 : 0;
 
   // Eye positions
   const leftEyeX = -0.25;
   const rightEyeX = 0.25;
   const eyeY = 0.15;
 
-  // Eyebrow offset - move OPPOSITE to the direction we're facing
-  // Facing right -> eyebrows shift left, facing left -> eyebrows shift right
-  const eyebrowOffset = lookDirection === "right" ? -0.03 : lookDirection === "left" ? 0.03 : 0;
+  // Eyebrow offset - move WITH the direction we're facing
+  // Facing right -> eyebrows shift right, facing left -> eyebrows shift left
+  const eyebrowOffset = lookDirection === "right" ? 0.03 : lookDirection === "left" ? -0.03 : 0;
 
   return (
     <group ref={groupRef} position={[0, 0.1, 1.12]}>
@@ -98,7 +99,7 @@ export function Face({ expression = "happy", blobColor = "#ff9a9e", lookDirectio
           {/* Looking eyes: small filled circles with ( arch eyebrows */}
           {/* Left eye */}
           <mesh position={[leftEyeX, eyeY, 0]}>
-            <circleGeometry args={[0.05, 16]} />
+            <circleGeometry args={[0.07, 16]} />
             <meshBasicMaterial color={faceColor} />
           </mesh>
           <Text
@@ -114,7 +115,7 @@ export function Face({ expression = "happy", blobColor = "#ff9a9e", lookDirectio
 
           {/* Right eye */}
           <mesh position={[rightEyeX, eyeY, 0]}>
-            <circleGeometry args={[0.05, 16]} />
+            <circleGeometry args={[0.07, 16]} />
             <meshBasicMaterial color={faceColor} />
           </mesh>
           <Text
