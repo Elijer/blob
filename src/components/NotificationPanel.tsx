@@ -28,6 +28,7 @@ const CODE_LINES = [
 const LINE_HEIGHT = 0.07;
 const VISIBLE_LINES = 7;
 const TEXT_COLOR = "#FFFFFF";
+const MONO_FONT = "./fonts/RobotoMono-Regular.ttf";
 
 export function NotificationPanel({ visible }: NotificationPanelProps) {
   const groupRef = useRef<THREE.Group>(null);
@@ -133,6 +134,7 @@ export function NotificationPanel({ visible }: NotificationPanelProps) {
             anchorX="left"
             anchorY="middle"
             fillOpacity={lineOpacity}
+            font={MONO_FONT}
           >
             {line}
           </Text>
