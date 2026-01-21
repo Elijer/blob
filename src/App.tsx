@@ -31,7 +31,7 @@ function App() {
         >
           <Suspense fallback={null}>
             <Environment />
-            <BlobMascot position={[0, 0, 0]} />
+            <BlobMascot position={[0, 0, 0]} showBackground={showBackground} />
           </Suspense>
         </Canvas>
       </div>

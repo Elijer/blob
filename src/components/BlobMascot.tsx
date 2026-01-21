@@ -10,6 +10,7 @@ interface BlobMascotProps {
   position?: [number, number, number];
   scale?: number;
   color?: string;
+  showBackground?: boolean;
 }
 
 // Create noise function outside component to persist
@@ -24,6 +25,7 @@ export function BlobMascot({
   position = [0, 0, 0],
   scale = 1,
   color = "#7CB7DB",
+  showBackground = true,
 }: BlobMascotProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const groupRef = useRef<THREE.Group>(null);
@@ -92,12 +94,12 @@ export function BlobMascot({
         setLookDirection("none");
         targetRotationY.current = 0;
         targetRotationX.current = 0;
-      }, 4000);
+      }, 6000);
     };
 
     // First turn after 3 seconds (for testing), then every 8 seconds
     const firstTimeout = setTimeout(doTurn, 3000);
-    const interval = setInterval(doTurn, 8000);
+    const interval = setInterval(doTurn, 14000);
 
     return () => {
       clearTimeout(firstTimeout);
@@ -244,6 +246,7 @@ export function BlobMascot({
     {/* Notification panel - outside squash/bounce, but rotates with head */}
     <NotificationPanel
       visible={lookDirection !== "none"}
+      showBackground={showBackground}
     />
     </group>
   );

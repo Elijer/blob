@@ -5,6 +5,7 @@ import * as THREE from "three";
 
 interface NotificationPanelProps {
   visible: boolean;
+  showBackground?: boolean;
 }
 
 const CODE_LINES = [
@@ -176,10 +177,12 @@ const CODE_LINES = [
 
 const LINE_HEIGHT = 0.07;
 const VISIBLE_LINES = 7;
-const TEXT_COLOR = "#FFFFFF";
+const TEXT_COLOR_WHITE = "#FFFFFF";
+const TEXT_COLOR_NO_BG = "#7CB7DA";
 const MONO_FONT = "./fonts/RobotoMono-Regular.ttf";
 
-export function NotificationPanel({ visible }: NotificationPanelProps) {
+export function NotificationPanel({ visible, showBackground = true }: NotificationPanelProps) {
+  const textColor = showBackground ? TEXT_COLOR_WHITE : TEXT_COLOR_NO_BG;
   const groupRef = useRef<THREE.Group>(null);
   const [lines, setLines] = useState<string[]>(() => {
     // Initialize with some lines
@@ -279,7 +282,7 @@ export function NotificationPanel({ visible }: NotificationPanelProps) {
             key={`${index}-${line}`}
             position={[-halfW + padding, yPos, 0]}
             fontSize={0.065}
-            color={TEXT_COLOR}
+            color={textColor}
             anchorX="left"
             anchorY="middle"
             fillOpacity={lineOpacity}
