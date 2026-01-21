@@ -3,10 +3,7 @@ import { useFrame } from "@react-three/fiber";
 import { Text } from "@react-three/drei";
 import * as THREE from "three";
 
-type LookDirection = "none" | "left" | "right";
-
 interface NotificationPanelProps {
-  lookDirection: LookDirection;
   visible: boolean;
 }
 
@@ -32,7 +29,7 @@ const LINE_HEIGHT = 0.07;
 const VISIBLE_LINES = 7;
 const TEXT_COLOR = "#FFFFFF";
 
-export function NotificationPanel({ lookDirection, visible }: NotificationPanelProps) {
+export function NotificationPanel({ visible }: NotificationPanelProps) {
   const groupRef = useRef<THREE.Group>(null);
   const [lines, setLines] = useState<string[]>(() => {
     // Initialize with some lines

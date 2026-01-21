@@ -8,7 +8,6 @@ type LookDirection = "none" | "left" | "right";
 
 interface FaceProps {
   expression?: MouthExpression;
-  blobColor?: string;
   lookDirection?: LookDirection;
 }
 
@@ -18,7 +17,7 @@ const MOUTH_CHARS: Record<MouthExpression, string> = {
   small: "-",      // Brief small mouth
 };
 
-export function Face({ expression = "happy", blobColor = "#7CB7DB", lookDirection = "none" }: FaceProps) {
+export function Face({ expression = "happy", lookDirection = "none" }: FaceProps) {
   const leftEyeRef = useRef<THREE.Object3D>(null);
   const rightEyeRef = useRef<THREE.Object3D>(null);
   const mouthRef = useRef<THREE.Object3D>(null);

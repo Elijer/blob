@@ -87,12 +87,12 @@ export function BlobMascot({
       targetRotationY.current = angle;
       targetRotationX.current = verticalTilt;
 
-      // After 2 seconds, return
+      // After 4 seconds, return
       setTimeout(() => {
         setLookDirection("none");
         targetRotationY.current = 0;
         targetRotationX.current = 0;
-      }, 2000);
+      }, 4000);
     };
 
     // First turn after 3 seconds (for testing), then every 8 seconds
@@ -238,12 +238,11 @@ export function BlobMascot({
       </animated.group>
 
       {/* Face - rotates with the blob */}
-      {scale >= 1 && <Face blobColor={color} lookDirection={lookDirection} />}
+      {scale >= 1 && <Face lookDirection={lookDirection} />}
     </animated.group>
 
     {/* Notification panel - outside squash/bounce, but rotates with head */}
     <NotificationPanel
-      lookDirection={lookDirection}
       visible={lookDirection !== "none"}
     />
     </group>
