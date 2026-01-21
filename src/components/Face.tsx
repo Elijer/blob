@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useMemo } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Text } from "@react-three/drei";
 import * as THREE from "three";
@@ -18,7 +18,7 @@ const MOUTH_CHARS: Record<MouthExpression, string> = {
   small: "-",      // Brief small mouth
 };
 
-export function Face({ expression = "happy", blobColor = "#ff9a9e", lookDirection = "none" }: FaceProps) {
+export function Face({ expression = "happy", blobColor = "#7CB7DB", lookDirection = "none" }: FaceProps) {
   const leftEyeRef = useRef<THREE.Object3D>(null);
   const rightEyeRef = useRef<THREE.Object3D>(null);
   const mouthRef = useRef<THREE.Object3D>(null);
@@ -27,17 +27,9 @@ export function Face({ expression = "happy", blobColor = "#ff9a9e", lookDirectio
   const [isBlinking, setIsBlinking] = useState(false);
   const [currentExpression, setCurrentExpression] = useState<MouthExpression>(expression);
 
-  const faceColor = "#9C454D";
+  const faceColor = "#214B64";
+  const blushColor = "#D9EAF5";
   const isLooking = lookDirection !== "none";
-
-  // Slightly lighter shade for blush
-  const blushColor = useMemo(() => {
-    const color = new THREE.Color(blobColor);
-    const hsl = { h: 0, s: 0, l: 0 };
-    color.getHSL(hsl);
-    color.setHSL(hsl.h * 0.95, Math.min(1, hsl.s * 1.3), Math.min(0.75, hsl.l * 1.2));
-    return `#${color.getHexString()}`;
-  }, [blobColor]);
 
   // Blinking logic (only when not looking around)
   useEffect(() => {

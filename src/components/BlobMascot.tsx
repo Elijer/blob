@@ -14,19 +14,22 @@ interface BlobMascotProps {
 // Create noise function outside component to persist
 const noise3D = createNoise3D();
 
-// ~18 degrees in radians
+// ~18 degrees in radians for horizontal turn
 const HEAD_TURN_ANGLE = 0.32;
+// ~25 degrees max for vertical tilt
+const MAX_VERTICAL_TILT = 0.44;
 
 export function BlobMascot({
   position = [0, 0, 0],
   scale = 1,
-  color = "#ff9a9e",
+  color = "#7CB7DB",
 }: BlobMascotProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const groupRef = useRef<THREE.Group>(null);
   const originalPositions = useRef<Float32Array | null>(null);
   const clickIntensity = useRef(0);
   const targetRotationY = useRef(0);
+  const targetRotationX = useRef(0);
   const [lookDirection, setLookDirection] = useState<"none" | "left" | "right">("none");
 
   // Store original vertex positions on first render
@@ -75,14 +78,19 @@ export function BlobMascot({
       const angle = isLeft ? HEAD_TURN_ANGLE : -HEAD_TURN_ANGLE;
       isLeft = !isLeft;
 
+      // Random vertical tilt (up or down, up to 25 degrees)
+      const verticalTilt = (Math.random() * 2 - 1) * MAX_VERTICAL_TILT;
+
       // Show looking eyes and start turning
       setLookDirection(direction);
       targetRotationY.current = angle;
+      targetRotationX.current = verticalTilt;
 
       // After 2 seconds, return
       setTimeout(() => {
         setLookDirection("none");
         targetRotationY.current = 0;
+        targetRotationX.current = 0;
       }, 2000);
     };
 
@@ -108,11 +116,15 @@ export function BlobMascot({
   };
 
   useFrame(({ clock }) => {
-    // Animate head rotation toward target
+    // Animate head rotation toward target (both horizontal and vertical)
     if (groupRef.current) {
       const currentY = groupRef.current.rotation.y;
       const targetY = targetRotationY.current;
       groupRef.current.rotation.y = THREE.MathUtils.lerp(currentY, targetY, 0.08);
+
+      const currentX = groupRef.current.rotation.x;
+      const targetX = targetRotationX.current;
+      groupRef.current.rotation.x = THREE.MathUtils.lerp(currentX, targetX, 0.08);
     }
 
     if (!meshRef.current) return;
