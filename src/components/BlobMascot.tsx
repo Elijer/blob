@@ -4,6 +4,7 @@ import { useSpring, animated } from "@react-spring/three";
 import * as THREE from "three";
 import { createNoise3D } from "simplex-noise";
 import { Face } from "./Face";
+import { NotificationPanel } from "./NotificationPanel";
 
 interface BlobMascotProps {
   position?: [number, number, number];
@@ -239,6 +240,12 @@ export function BlobMascot({
       {/* Face - rotates with the blob */}
       {scale >= 1 && <Face blobColor={color} lookDirection={lookDirection} />}
     </animated.group>
+
+    {/* Notification panel - outside squash/bounce, but rotates with head */}
+    <NotificationPanel
+      lookDirection={lookDirection}
+      visible={lookDirection !== "none"}
+    />
     </group>
   );
 }
