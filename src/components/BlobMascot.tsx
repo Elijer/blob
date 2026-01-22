@@ -200,13 +200,24 @@ export function BlobMascot({
 
   // Create soft, matte material
   const material = useMemo(() => {
-    return new THREE.MeshStandardMaterial({
+    const mat = new THREE.MeshStandardMaterial({
       color: new THREE.Color(color),
       roughness: 0.7,
       metalness: 0.0,
       envMapIntensity: 0.15,
+      flatShading: !isSmooth, // Flat shading shows polygons, smooth shading hides them
     });
-  }, [color]);
+    return mat;
+  }, [color, isSmooth]);
+  
+  // Update material when smoothness changes
+  useEffect(() => {
+    if (meshRef.current && meshRef.current.material) {
+      const mat = meshRef.current.material as THREE.MeshStandardMaterial;
+      mat.flatShading = !isSmooth;
+      mat.needsUpdate = true;
+    }
+  }, [isSmooth]);
 
   return (
     <group ref={groupRef} position={position}>

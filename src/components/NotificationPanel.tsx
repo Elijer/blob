@@ -133,6 +133,7 @@ export function NotificationPanel({ visible }: NotificationPanelProps) {
             anchorX="left"
             anchorY="middle"
             fillOpacity={lineOpacity}
+            font="./fonts/RobotoMono-Regular.ttf"
           >
             {line}
           </Text>
