@@ -5,184 +5,31 @@ import * as THREE from "three";
 
 interface NotificationPanelProps {
   visible: boolean;
-  showBackground?: boolean;
 }
 
 const CODE_LINES = [
-  // Oocyte & retrieval
   "26 viable oocytes discovered",
-  "oocyte maturation: complete",
-  "retrieval scheduled: 36hr post-trigger",
-  "follicle aspiration in progress",
-  "oocyte count: 18 retrieved",
-  "mature oocytes: 14 (MII)",
-  "oocyte quality: grade A",
-  "cryopreservation initiated",
-  "vitrification complete",
-  "oocytes stored: tank 7, canister 3",
-
-  // Hormone levels
-  "estradiol: 2,847 pg/mL",
-  "progesterone: 0.8 ng/mL",
-  "LH surge detected",
-  "FSH level: 6.2 mIU/mL",
-  "AMH: 3.4 ng/mL",
-  "beta-hCG: 245 mIU/mL",
-  "progesterone levels: nominal",
-  "hormone panel: within range",
-  "estradiol rising normally",
-  "LH: 42.1 mIU/mL (peak)",
-
-  // Monitoring & ultrasound
-  "ultrasound data received",
-  "follicle count: 14",
-  "lead follicle: 19mm",
-  "endometrial thickness: 9.2mm",
-  "trilaminar pattern confirmed",
-  "antral follicle count: 22",
-  "ovarian response: optimal",
-  "follicle mapping complete",
-  "bilateral ovary scan done",
-  "uterine lining: receptive",
-
-  // Cycle tracking
-  "cycle day: 12",
-  "stimulation day: 8",
-  "trigger shot: tonight 10pm",
-  "baseline scan scheduled",
-  "monitoring visit #4 complete",
-  "next appointment: 48hr",
-  "cycle day 3 labs ordered",
-  "mid-cycle check confirmed",
-  "ovulation predicted: 24-36hr",
-  "luteal phase support started",
-
-  // Lab & embryology
   "scanning for viability...",
-  "fertilization rate: 78%",
-  "ICSI procedure complete",
-  "embryo development: day 3",
-  "8-cell embryo observed",
-  "blastocyst formation: day 5",
-  "embryo grading: 4AA",
-  "PGT-A biopsy complete",
-  "genetic results pending",
-  "euploid embryos: 3",
-  "embryo transfer scheduled",
-  "assisted hatching performed",
-
-  // Communications
+  "triggering protocol initiated",
   "contacting remote lab",
+  "progesterone levels: nominal",
+  "estradiol: 2,847 pg/mL",
+  "follicle count: 14",
+  "LH surge detected",
+  "scheduling retrieval",
   "syncing with fertility center",
+  "ultrasound data received",
+  "cycle day: 12",
+  "endometrial thickness: 9.2mm",
   "transferring records...",
   "patient notified",
-  "physician review requested",
-  "lab results transmitted",
-  "secure message sent",
-  "appointment confirmed",
-  "consent forms received",
-  "insurance verification sent",
-
-  // IUI specific
-  "IUI procedure scheduled",
-  "sperm wash complete",
-  "motile sperm count: 22M",
-  "insemination successful",
-  "post-IUI rest: 15 min",
-  "IUI timing: optimal",
-  "sperm preparation ready",
-  "catheter placement confirmed",
-
-  // Egg freezing
-  "egg freezing cycle: day 6",
-  "cryobank storage confirmed",
-  "fertility preservation complete",
-  "frozen oocyte inventory: 18",
-  "storage renewal: 11 months",
-  "thaw survival rate: 92%",
-  "elective freeze: approved",
-
-  // Medications
-  "triggering protocol initiated",
-  "Gonal-F: 225 IU daily",
-  "Menopur: 150 IU added",
-  "Cetrotide started: day 6",
-  "Lupron trigger: 80 units",
-  "progesterone: 50mg IM",
-  "estrace: 2mg twice daily",
-  "medication inventory: OK",
-  "refill request: processed",
-  "injection site: rotated",
-
-  // Status updates
-  "protocol: antagonist",
-  "response: high responder",
-  "OHSS risk: monitoring",
-  "coast day: 1 of 2",
-  "stim adjustment: +75 IU",
-  "cycle cancelled: poor response",
-  "cycle converted: IUI",
-  "freeze-all recommended",
-  "fresh transfer: approved",
-
-  // System operations
-  "syncing patient records...",
-  "EMR update complete",
-  "lab interface: connected",
-  "imaging server: online",
-  "backup verification: passed",
-  "HIPAA audit: compliant",
-  "data encryption: active",
-  "portal access: granted",
-
-  // Scheduling
-  "OR suite: reserved",
-  "anesthesia: confirmed",
-  "pre-op labs: complete",
-  "NPO after midnight",
-  "arrival time: 6:30am",
-  "procedure duration: 20min",
-  "recovery room: available",
-  "discharge time: estimated 2hr",
-
-  // Results & outcomes
-  "positive pregnancy test",
-  "beta doubling: normal",
-  "heartbeat detected: 6w2d",
-  "twins confirmed",
-  "singleton pregnancy",
-  "chemical pregnancy noted",
-  "beta trending down",
-  "repeat beta: 48hr",
-
-  // Coordination
-  "referring clinic notified",
-  "records request: sent",
-  "prior auth: approved",
-  "coverage verified: 80%",
-  "out-of-network: processed",
-  "coordination complete",
-  "case review: Thursday",
-  "multidisciplinary consult",
-
-  // Quality metrics
-  "lab QC: passed",
-  "incubator temp: 37.0°C",
-  "CO2 level: 6.0%",
-  "humidity: 95%",
-  "air quality: HEPA filtered",
-  "equipment calibration: due",
-  "maintenance log: updated",
 ];
 
 const LINE_HEIGHT = 0.07;
 const VISIBLE_LINES = 7;
-const TEXT_COLOR_WHITE = "#FFFFFF";
-const TEXT_COLOR_NO_BG = "#7CB7DA";
-const MONO_FONT = "./fonts/RobotoMono-Regular.ttf";
+const TEXT_COLOR = "#FFFFFF";
 
-export function NotificationPanel({ visible, showBackground = true }: NotificationPanelProps) {
-  const textColor = showBackground ? TEXT_COLOR_WHITE : TEXT_COLOR_NO_BG;
+export function NotificationPanel({ visible }: NotificationPanelProps) {
   const groupRef = useRef<THREE.Group>(null);
   const [lines, setLines] = useState<string[]>(() => {
     // Initialize with some lines
@@ -282,11 +129,10 @@ export function NotificationPanel({ visible, showBackground = true }: Notificati
             key={`${index}-${line}`}
             position={[-halfW + padding, yPos, 0]}
             fontSize={0.065}
-            color={textColor}
+            color={TEXT_COLOR}
             anchorX="left"
             anchorY="middle"
             fillOpacity={lineOpacity}
-            font={MONO_FONT}
           >
             {line}
           </Text>

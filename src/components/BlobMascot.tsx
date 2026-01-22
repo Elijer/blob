@@ -100,12 +100,12 @@ export function BlobMascot({
         setLookDirection("none");
         targetRotationY.current = 0;
         targetRotationX.current = 0;
-      }, 6000);
+      }, 4000);
     };
 
     // First turn after 3 seconds (for testing), then every 8 seconds
     const firstTimeout = setTimeout(doTurn, 3000);
-    const interval = setInterval(doTurn, 14000);
+    const interval = setInterval(doTurn, 8000);
 
     return () => {
       clearTimeout(firstTimeout);
@@ -200,24 +200,13 @@ export function BlobMascot({
 
   // Create soft, matte material
   const material = useMemo(() => {
-    const mat = new THREE.MeshStandardMaterial({
+    return new THREE.MeshStandardMaterial({
       color: new THREE.Color(color),
       roughness: 0.7,
       metalness: 0.0,
       envMapIntensity: 0.15,
-      flatShading: !isSmooth, // Flat shading shows polygons, smooth shading hides them
     });
-    return mat;
-  }, [color, isSmooth]);
-  
-  // Update material when smoothness changes
-  useEffect(() => {
-    if (meshRef.current && meshRef.current.material) {
-      const mat = meshRef.current.material as THREE.MeshStandardMaterial;
-      mat.flatShading = !isSmooth;
-      mat.needsUpdate = true;
-    }
-  }, [isSmooth]);
+  }, [color]);
 
   return (
     <group ref={groupRef} position={position}>
@@ -263,7 +252,6 @@ export function BlobMascot({
     {/* Notification panel - outside squash/bounce, but rotates with head */}
     <NotificationPanel
       visible={lookDirection !== "none"}
-      showBackground={showBackground}
     />
     </group>
   );
