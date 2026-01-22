@@ -9,11 +9,17 @@
   height: 300px; */
 }
 
-.background-toggle {
+.button-container {
   position: fixed;
   top: 20px;
   right: 20px;
   z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.background-toggle {
   padding: 8px 16px;
   background: rgba(30, 30, 30, 0.8);
   border: 1px solid rgba(100, 100, 100, 0.5);

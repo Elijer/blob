@@ -11,6 +11,7 @@ interface BlobMascotProps {
   scale?: number;
   color?: string;
   showBackground?: boolean;
+  isSmooth?: boolean;
 }
 
 // Create noise function outside component to persist
@@ -26,6 +27,7 @@ export function BlobMascot({
   scale = 1,
   color = "#7CB7DB",
   showBackground = true,
+  isSmooth = false,
 }: BlobMascotProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const groupRef = useRef<THREE.Group>(null);
@@ -36,10 +38,14 @@ export function BlobMascot({
   const [lookDirection, setLookDirection] = useState<"none" | "left" | "right">("none");
 
   // Store original vertex positions on first render
+  // Use much higher detail for smooth mode to truly hide polygons
   const geometry = useMemo(() => {
-    const geo = new THREE.IcosahedronGeometry(1, 5);
+    const detail = isSmooth ? 38 : 4;
+    const geo = new THREE.IcosahedronGeometry(1, detail);
+    // Reset original positions when geometry changes
+    originalPositions.current = null;
     return geo;
-  }, []);
+  }, [isSmooth]);
 
   // Bouncy idle animation using spring - gentler, more flowy
   const { bounceY } = useSpring({
@@ -194,13 +200,24 @@ export function BlobMascot({
 
   // Create soft, matte material
   const material = useMemo(() => {
-    return new THREE.MeshStandardMaterial({
+    const mat = new THREE.MeshStandardMaterial({
       color: new THREE.Color(color),
       roughness: 0.7,
       metalness: 0.0,
       envMapIntensity: 0.15,
+      flatShading: !isSmooth, // Flat shading shows polygons, smooth shading hides them
     });
-  }, [color]);
+    return mat;
+  }, [color, isSmooth]);
+  
+  // Update material when smoothness changes
+  useEffect(() => {
+    if (meshRef.current && meshRef.current.material) {
+      const mat = meshRef.current.material as THREE.MeshStandardMaterial;
+      mat.flatShading = !isSmooth;
+      mat.needsUpdate = true;
+    }
+  }, [isSmooth]);
 
   return (
     <group ref={groupRef} position={position}>

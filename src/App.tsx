@@ -6,6 +6,7 @@ import "./App.css";
 
 function App() {
   const [showBackground, setShowBackground] = useState(true);
+  const [isSmooth, setIsSmooth] = useState(true);
 
   useEffect(() => {
     if (showBackground) {
@@ -31,17 +32,26 @@ function App() {
         >
           <Suspense fallback={null}>
             <Environment />
-            <BlobMascot position={[0, 0, 0]} showBackground={showBackground} />
+            <BlobMascot position={[0, 0, 0]} showBackground={showBackground} isSmooth={isSmooth} />
           </Suspense>
         </Canvas>
       </div>
-      <button
-        className="background-toggle"
-        onClick={() => setShowBackground(!showBackground)}
-        aria-label="Toggle background gradient"
-      >
-        {showBackground ? "Hide BG" : "Show BG"}
-      </button>
+      <div className="button-container">
+        <button
+          className="background-toggle"
+          onClick={() => setShowBackground(!showBackground)}
+          aria-label="Toggle background gradient"
+        >
+          {showBackground ? "Hide BG" : "Show BG"}
+        </button>
+        <button
+          className="background-toggle"
+          onClick={() => setIsSmooth(!isSmooth)}
+          aria-label="Toggle smooth blob"
+        >
+          {isSmooth ? "Rough" : "Smooth"}
+        </button>
+      </div>
     </>
   );
 }
