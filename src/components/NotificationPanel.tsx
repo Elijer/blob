@@ -5,6 +5,7 @@ import * as THREE from "three";
 
 interface NotificationPanelProps {
   visible: boolean;
+  fontSize?: number;
 }
 
 const CODE_LINES = [
@@ -29,7 +30,7 @@ const LINE_HEIGHT = 0.07;
 const VISIBLE_LINES = 7;
 const TEXT_COLOR = "#FFFFFF";
 
-export function NotificationPanel({ visible }: NotificationPanelProps) {
+export function NotificationPanel({ visible, fontSize = 0.065 }: NotificationPanelProps) {
   const groupRef = useRef<THREE.Group>(null);
   const [lines, setLines] = useState<string[]>(() => {
     // Initialize with some lines
@@ -128,7 +129,7 @@ export function NotificationPanel({ visible }: NotificationPanelProps) {
           <Text
             key={`${index}-${line}`}
             position={[-halfW + padding, yPos, 0]}
-            fontSize={0.065}
+            fontSize={fontSize}
             color={TEXT_COLOR}
             anchorX="left"
             anchorY="middle"

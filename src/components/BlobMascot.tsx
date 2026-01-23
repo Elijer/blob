@@ -12,21 +12,25 @@ interface BlobMascotProps {
   scale?: number;
   color?: string;
   isSmooth?: boolean;
+  showFace?: boolean;
+  textFontSize?: number;
 }
 
 // Create noise function outside component to persist
 const noise3D = createNoise3D();
 
-// ~18 degrees in radians for horizontal turn
-const HEAD_TURN_ANGLE = 0.32;
-// ~25 degrees max for vertical tilt
-const MAX_VERTICAL_TILT = 0.44;
+// ~14 degrees in radians for horizontal turn
+const HEAD_TURN_ANGLE = 0.24;
+// ~10 degrees max for vertical tilt
+const MAX_VERTICAL_TILT = 0.17;
 
 export function BlobMascot({
   position = [0, 0, 0],
   scale = 1,
   color = "#7CB7DB",
   isSmooth = false,
+  showFace = true,
+  textFontSize,
 }: BlobMascotProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const groupRef = useRef<THREE.Group>(null);
@@ -77,16 +81,14 @@ export function BlobMascot({
     config: { tension: 300, friction: 10 },
   }));
 
-  // Head turn animation: 8 seconds normal, then ~4 seconds looking to one side
+  // Head turn animation: 40 seconds normal, then ~4 seconds looking left
   useEffect(() => {
-    let isLeft = true;
-
     const doTurn = () => {
-      const direction = isLeft ? "left" : "right";
-      const angle = isLeft ? HEAD_TURN_ANGLE : -HEAD_TURN_ANGLE;
-      isLeft = !isLeft;
+      // Always look left (negative angle = left from viewer's perspective)
+      const direction = "left";
+      const angle = -HEAD_TURN_ANGLE;
 
-      // Random vertical tilt (up or down, up to 25 degrees)
+      // Small random vertical tilt
       const verticalTilt = (Math.random() * 2 - 1) * MAX_VERTICAL_TILT;
 
       // Show looking eyes and start turning
@@ -102,9 +104,9 @@ export function BlobMascot({
       }, 4000);
     };
 
-    // First turn after 3 seconds (for testing), then every 8 seconds
-    const firstTimeout = setTimeout(doTurn, 3000);
-    const interval = setInterval(doTurn, 8000);
+    // First turn after 5 seconds, then every 40 seconds
+    const firstTimeout = setTimeout(doTurn, 5000);
+    const interval = setInterval(doTurn, 40000);
 
     return () => {
       clearTimeout(firstTimeout);
@@ -256,12 +258,13 @@ export function BlobMascot({
       </animated.group>
 
       {/* Face - rotates with the blob */}
-      {scale >= 1 && <Face lookDirection={lookDirection} />}
+      {showFace && <Face lookDirection={lookDirection} />}
     </animated.group>
 
     {/* Notification panel - outside squash/bounce, but rotates with head */}
     <NotificationPanel
       visible={lookDirection !== "none"}
+      fontSize={textFontSize}
     />
 
     {/* Sparkles floating around the blob */}
