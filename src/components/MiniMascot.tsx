@@ -15,7 +15,7 @@ export function MiniMascot({ visible }: MiniMascotProps) {
       style={{
         position: "fixed",
         bottom: "-50px",
-        right: "240px",
+        right: "190px",
         width: "550px",
         height: "550px",
         pointerEvents: "none",
@@ -30,7 +30,7 @@ export function MiniMascot({ visible }: MiniMascotProps) {
       >
         <Suspense fallback={null}>
           <Environment />
-          <BlobMascot position={[0, 0.2, 0]} scale={0.6} isSmooth={true} textFontSize={0.032} />
+          <BlobMascot position={[0, -0.4, 0]} scale={0.6} isSmooth={true} textFontSize={0.032} />
         </Suspense>
       </Canvas>
     </div>
