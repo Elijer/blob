@@ -5,6 +5,7 @@ import * as THREE from "three";
 import { createNoise3D } from "simplex-noise";
 import { Face } from "./Face";
 import { NotificationPanel } from "./NotificationPanel";
+import { Sparkles } from "./Sparkles";
 
 interface BlobMascotProps {
   position?: [number, number, number];
@@ -262,6 +263,9 @@ export function BlobMascot({
     <NotificationPanel
       visible={lookDirection !== "none"}
     />
+
+    {/* Sparkles floating around the blob */}
+    <Sparkles count={6} radius={1.3 * scale} color="#ffffff" />
     </group>
   );
 }
