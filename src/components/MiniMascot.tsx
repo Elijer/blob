@@ -14,10 +14,10 @@ export function MiniMascot({ visible }: MiniMascotProps) {
     <div
       style={{
         position: "fixed",
-        bottom: "-50px",
-        right: "190px",
+        bottom: "-120px",
+        right: "210px",
         width: "550px",
-        height: "550px",
+        height: "680px",
         pointerEvents: "none",
         zIndex: 2147483646,
         animation: "miniMascotFadeIn 0.4s ease-out",
@@ -26,7 +26,7 @@ export function MiniMascot({ visible }: MiniMascotProps) {
       <Canvas
         camera={{ position: [0, 0, 4], fov: 50 }}
         gl={{ alpha: true, antialias: true }}
-        style={{ background: "transparent" }}
+        style={{ background: "transparent", pointerEvents: "none" }}
       >
         <Suspense fallback={null}>
           <Environment />
