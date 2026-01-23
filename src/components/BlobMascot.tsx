@@ -10,7 +10,6 @@ interface BlobMascotProps {
   position?: [number, number, number];
   scale?: number;
   color?: string;
-  showBackground?: boolean;
   isSmooth?: boolean;
 }
 
@@ -26,7 +25,6 @@ export function BlobMascot({
   position = [0, 0, 0],
   scale = 1,
   color = "#7CB7DB",
-  showBackground = true,
   isSmooth = false,
 }: BlobMascotProps) {
   const meshRef = useRef<THREE.Mesh>(null);

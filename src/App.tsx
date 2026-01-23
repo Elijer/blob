@@ -48,7 +48,7 @@ function App() {
           <Suspense fallback={null}>
             <FontPreloader />
             <Environment />
-            <BlobMascot position={[0, 0, 0]} showBackground={showBackground} isSmooth={isSmooth} />
+            <BlobMascot position={[0, 0, 0]} isSmooth={isSmooth} />
           </Suspense>
         </Canvas>
       </div>
