@@ -3,7 +3,12 @@ import { Suspense, useState, useEffect } from "react";
 import { Text } from "@react-three/drei";
 import { BlobMascot } from "./components/BlobMascot";
 import { Environment } from "./components/Environment";
+import { MiniMascot } from "./components/MiniMascot";
+import { useIntercom } from "./hooks/useIntercom";
 import "./App.css";
+
+// Replace with your actual Intercom app ID
+const INTERCOM_APP_ID = import.meta.env.VITE_INTERCOM_APP_ID || "";
 
 // Hidden text to preload the font immediately
 function FontPreloader() {
@@ -22,6 +27,7 @@ function FontPreloader() {
 function App() {
   const [showBackground, setShowBackground] = useState(true);
   const [isSmooth, setIsSmooth] = useState(true);
+  const { isOpen: isIntercomOpen } = useIntercom({ appId: INTERCOM_APP_ID });
 
   useEffect(() => {
     if (showBackground) {
@@ -39,19 +45,22 @@ function App() {
 
   return (
     <>
-      <div className="canvas-container">
-        <Canvas
-          camera={{ position: [0, 0, 5], fov: 50 }}
-          gl={{ alpha: true, antialias: true }}
-          style={{ background: "transparent" }}
-        >
-          <Suspense fallback={null}>
-            <FontPreloader />
-            <Environment />
-            <BlobMascot position={[0, 0, 0]} isSmooth={isSmooth} />
-          </Suspense>
-        </Canvas>
-      </div>
+      {/* Main blob - hidden when Intercom is open */}
+      {!isIntercomOpen && (
+        <div className="canvas-container">
+          <Canvas
+            camera={{ position: [0, 0, 5], fov: 50 }}
+            gl={{ alpha: true, antialias: true }}
+            style={{ background: "transparent" }}
+          >
+            <Suspense fallback={null}>
+              <FontPreloader />
+              <Environment />
+              <BlobMascot position={[0, 0, 0]} isSmooth={isSmooth} />
+            </Suspense>
+          </Canvas>
+        </div>
+      )}
       <div className="button-container">
         <button
           className="background-toggle"
@@ -68,6 +77,9 @@ function App() {
           {isSmooth ? "Rough" : "Smooth"}
         </button>
       </div>
+
+      {/* Mini mascot that appears when Intercom chat is open */}
+      <MiniMascot visible={isIntercomOpen} />
     </>
   );
 }
